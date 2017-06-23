@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import numpy as np
-from termcolor import colored, cprint
 
 class checkers_backend(object):
     def __init__(self):
