@@ -155,6 +155,8 @@ sub update_graphic {
     add_left_leg();
   } elsif($frame eq 7) {
     add_right_leg();
+    addstr($row -14, $col/2-5, 'your word was : '.$_[1]);
+    # addstr($row -20, $col/2-5, $_[1]);
     addstr($row-1, $col/2-30, 'you killed him! game over. do you want to play again? (y/n) ');
     my $answer = '';
     getstr($answer);
@@ -188,12 +190,13 @@ sub guess_box {
 }
 
 sub play {
+  clear();
   display_title();
   my $current_word = get_rand_word();
   my @current_wrong;
   chomp $current_word;
   display_underscores($current_word);
-  addstr(4,4,$current_word);
+  # addstr(4,4,$current_word);
   populate_dict();
   display_gallows();
   add_legend();
@@ -244,7 +247,7 @@ sub play {
           $guess_count++;
           push @current_wrong, $input;
           addstr(1,$col-15+$guess_count, $input);
-          update_graphic($guess_count);
+          update_graphic($guess_count, $current_word);
         }
       }
     }
