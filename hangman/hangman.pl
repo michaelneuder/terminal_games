@@ -22,7 +22,33 @@ sub display_title {
 
 sub populate_dict {
   %dictionary = (
-    "a"  => " __ _ \n/ _` |\n\\__,_|\n",);
+    "a"  => (" __ _", "/ _` |", "\\__,_|"),
+    "b"  => (" _    ", " | |__ ", " | '_ \\", " |_.__/"),
+    "c"  => (" __ ", " / _|", " \\__|"),
+    "d"  => ("    _ ", "  __| |", " / _` |", " \\__,_|"),
+    "e"  => (" ___ ", " / -_)", " \\___|"),
+    "f"  => ("  __ ", "  / _|", " |  _|", " |_|  "),
+    "g"  => (" __ _ ", " / _` |", " \\__, |", " \\__, |"),
+    "h"  => (" _    ", " | |_  ", " | ' \\ ", " |_||_|"),
+    "i"  => (" _ ", " (_)", " | |", " |_|"),
+    "j"  => ("  _ ", "  (_)", "  | |", " _/ |", " |__/ "),
+    "k"  => (" _   ", " | |__", " | / /", " |_\\_\\"),
+    "l"  => (" _ ", " | |", " | |", " |_|"),
+    "m"  => (" _ __  ", " | '  \\ ", " |_|_|_|"),
+    "n"  => (" _ _  ", " | ' \\ ", " |_||_|"),
+    "o"  => (" ___ ", " / _ \\", " \\___/"),
+    "p"  => (" _ __ ", " | '_ \\", " | .__/", " |_|   "),
+    "q"  => (" __ _ ", " / _` |", " \\__, |", "    |_|"),
+    "r"  => (" _ _ ", " | '_|", " |_|  "),
+    "s"  => (" ___", " (_-<", " /__/"),
+    "t"  => (" _   ", " | |_ ", " |  _|", "  \\__|"),
+    "u"  => (" _  _ ", " | || |", "  \\_,_|"),
+    "v"  => ("__ __", " \\ V /", "  \\_/ "),
+    "w"  => ("__ __ __", " \\ V  V /", "  \\_/\\_/ "),
+    "x"  => ("__ __", " \\ \\ /", " /_\\_\\"),
+    "y"  => (" _  _ ", " | || |", "  \\_, |", "  |__/ "),
+    "z"  => (" ___", " |_ /", " /__|")
+  );
 }
 
 sub get_rand_word {
@@ -107,19 +133,51 @@ sub add_right_leg {
 }
 
 sub add_legend {
-  addstr(0,1,'--------------');
+  addstr(0,1,'*------------*');
   addstr(1,1,'| qq - quit  |');
   addstr(2,1,'| rr - reset |');
-  addstr(3,1,'--------------');
+  addstr(3,1,'*------------*');
+}
+
+sub update_graphic {
+  my $frame = $_[0];
+  if($frame eq 1){
+    add_head();
+  } elsif($frame eq 2) {
+    add_neck();
+  } elsif($frame eq 3) {
+    add_left_arm();
+  } elsif($frame eq 4) {
+    add_right_arm();
+  } elsif($frame eq 5) {
+    add_body();
+  } elsif($frame eq 6) {
+    add_left_leg();
+  } elsif($frame eq 7) {
+    add_right_leg();
+  } elsif($frame eq 8) {
+    addstr(7,7,'dead');
+  }
+}
+
+sub guess_box {
+  my $display_col = $col-23;
+  addstr(0,$display_col, "*---------------------*");
+  addstr(1,$display_col, "|wrong:               |");
+  addstr(2,$display_col, "*---------------------*");
 }
 
 sub play {
   display_title();
   my $current_word = get_rand_word();
+  my @current_wrong;
+  chomp $current_word;
   display_underscores($current_word);
+  addstr(4,4,$current_word);
   populate_dict();
   display_gallows();
   add_legend();
+  guess_box();
 
   my $input = '';
   my $guess_count = 0;
@@ -135,28 +193,27 @@ sub play {
       endwin();
       exit;
     } else {
-      for
+      my $letter_num = 0;
+      my $found = 0;
+      foreach my $char (split //, $current_word){
+        if($char eq $input){
+          my $display_col = $col/2 - (length($current_word)*9)/2;
+          addstr($row-7, $display_col+9*($letter_num+1)-5, $input);
+          addstr(5,5,'true');
+          $found = 1;
+        }
+        $letter_num++;
+      }
+      if($found eq 0){
+        addstr(5,5,$input);
+        $guess_count++;
+        push @current_wrong, $input;
+        addstr(1,$col-15+$guess_count, $input);
+        update_graphic($guess_count);
+      }
     }
   }
 }
 
 play();
 endwin();
-
-#### useful stuff
-# display_gallows();
-# getch();
-# add_head();
-# getch();
-# add_neck();
-# getch();
-# add_left_arm();
-# getch();
-# add_right_arm();
-# getch();
-# add_body();
-# getch();
-# add_left_leg();
-# getch();
-# add_right_leg();
-# getch();
