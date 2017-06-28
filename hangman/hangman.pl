@@ -155,8 +155,28 @@ sub update_graphic {
     add_left_leg();
   } elsif($frame eq 7) {
     add_right_leg();
-  } elsif($frame eq 8) {
-    addstr(7,7,'dead');
+    addstr($row-1, $col/2-30, 'you killed him! game over. do you want to play again? (y/n) ');
+    my $answer = '';
+    getstr($answer);
+    chomp $answer;
+    if($answer eq 'y'){
+      play();
+    } elsif ($answer eq 'n') {
+      endwin();
+      exit;
+    } else {
+      move($row-1, $col/2-30);
+      clrtoeol();
+      addstr($row-1, $col/2-10, 'please enter y or n: ');
+      getstr($answer);
+      chomp $answer;
+      if($answer eq 'y'){
+        play();
+      } else {
+        endwin();
+        exit
+      }
+    }
   }
 }
 
@@ -186,30 +206,46 @@ sub play {
     clrtoeol();
     addstr($row-2, $col/2-10, "enter your guess: ");
     getstr($input);
+    move($row-1, $col/2-15);
+    clrtoeol();
     chomp $input;
     if($input eq 'rr'){
       play();
     } elsif($input eq 'qq'){
       endwin();
       exit;
+    } elsif($input ne 'a' && $input ne 'b' && $input ne 'c' && $input ne 'd' && $input ne 'e'
+     && $input ne 'f' && $input ne 'g' && $input ne 'h' && $input ne 'i' && $input ne 'j'
+     && $input ne 'k' && $input ne 'l' && $input ne 'm' && $input ne 'n' && $input ne 'o'
+     && $input ne 'p' && $input ne 'q' && $input ne 'r' && $input ne 's' && $input ne 't'
+     && $input ne 'u' && $input ne 'v' && $input ne 'w' && $input ne 'x' && $input ne 'y'
+     && $input ne 'z') {
+       addstr($row-1, $col/2-15, "please enter a valid letter");
     } else {
-      my $letter_num = 0;
-      my $found = 0;
-      foreach my $char (split //, $current_word){
-        if($char eq $input){
-          my $display_col = $col/2 - (length($current_word)*9)/2;
-          addstr($row-7, $display_col+9*($letter_num+1)-5, $input);
-          addstr(5,5,'true');
-          $found = 1;
+      my $already_guessed = 0;
+      for(my $i=0; $i<scalar @current_wrong; $i++){
+        if($current_wrong[$i] eq $input){
+          $already_guessed = 1;
+          addstr($row-1, $col/2-15, "please enter a new guess");
         }
-        $letter_num++;
       }
-      if($found eq 0){
-        addstr(5,5,$input);
-        $guess_count++;
-        push @current_wrong, $input;
-        addstr(1,$col-15+$guess_count, $input);
-        update_graphic($guess_count);
+      if($already_guessed eq 0){
+        my $letter_num = 0;
+        my $found = 0;
+        foreach my $char (split //, $current_word){
+          if($char eq $input){
+            my $display_col = $col/2 - (length($current_word)*9)/2;
+            addstr($row-7, $display_col+9*($letter_num+1)-5, $input);
+            $found = 1;
+          }
+          $letter_num++;
+        }
+        if($found eq 0){
+          $guess_count++;
+          push @current_wrong, $input;
+          addstr(1,$col-15+$guess_count, $input);
+          update_graphic($guess_count);
+        }
       }
     }
   }
