@@ -156,8 +156,7 @@ sub update_graphic {
   } elsif($frame eq 7) {
     add_right_leg();
     addstr($row -14, $col/2-5, 'your word was : '.$_[1]);
-    # addstr($row -20, $col/2-5, $_[1]);
-    addstr($row-1, $col/2-30, 'you killed him! game over. do you want to play again? (y/n) ');
+    addstr($row-1, $col/2-30, 'you killed him! do you want to play again? (y/n) ');
     my $answer = '';
     getstr($answer);
     chomp $answer;
@@ -189,6 +188,31 @@ sub guess_box {
   addstr(2,$display_col, "*---------------------*");
 }
 
+sub display_win {
+  addstr($row-1, $col/2-20, 'you win! do you want to play again? (y/n) ');
+  my $answer = '';
+  getstr($answer);
+  chomp $answer;
+  if($answer eq 'y'){
+    play();
+  } elsif ($answer eq 'n') {
+    endwin();
+    exit;
+  } else {
+    move($row-1, $col/2-30);
+    clrtoeol();
+    addstr($row-1, $col/2-10, 'please enter y or n: ');
+    getstr($answer);
+    chomp $answer;
+    if($answer eq 'y'){
+      play();
+    } else {
+      endwin();
+      exit
+    }
+  }
+}
+
 sub play {
   clear();
   display_title();
@@ -204,6 +228,7 @@ sub play {
 
   my $input = '';
   my $guess_count = 0;
+  my $correct_letter_count = 0;
   while($input ne 'qq'){
     move($row-2, $col/2);
     clrtoeol();
@@ -240,8 +265,12 @@ sub play {
             my $display_col = $col/2 - (length($current_word)*9)/2;
             addstr($row-7, $display_col+9*($letter_num+1)-5, $input);
             $found = 1;
+            $correct_letter_count++;
           }
           $letter_num++;
+          if($correct_letter_count eq length($current_word)){
+            display_win();
+          }
         }
         if($found eq 0){
           $guess_count++;
